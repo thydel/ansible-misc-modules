@@ -95,10 +95,16 @@ def main():
             basedir=dict(),
             strip=dict(default=0, aliases=['p'])	
         ),
+        supports_check_mode = True
     )
     patchfile, strip, basedir = _get_params(module)
 
     changed = False
+
+    if module.check_mode:
+        if _is_already_applied(patchfile, strip):
+            module.exit_json(changed=changed)
+        module.exit_json(changed=True)
 
     if not _is_already_applied(patchfile, strip):
         _apply_patch(module, patchfile, strip)
